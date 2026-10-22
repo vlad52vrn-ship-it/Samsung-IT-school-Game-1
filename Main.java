@@ -16,22 +16,39 @@ public class Main {
 
         String[][] board = new String[sizeBoard][sizeBoard];
 
-        for (int y = 1; y <= sizeBoard; y++) {
-            for (int x = 1; x <= sizeBoard; x++) {
-                board[y - 1][x - 1] = "  ";
+        for (int y = 0; y < sizeBoard; y++) {
+            for (int x = 0; x < sizeBoard; x++) {
+                board[y][x] = "  ";
             }
         }
 
         int countMonster = sizeBoard * sizeBoard - sizeBoard - 1;
         Monster[] monsters = new Monster[countMonster];
+        int count = 0;
 
-        for (int i = 0; i < countMonster; i++) {
-            Monster monster = new Monster(sizeBoard);
-            board[random.nextInt(sizeBoard - 1)]
-                    [random.nextInt(sizeBoard)] = monster.getImage();
+        while(count < countMonster) {
+            Monster monster;
+
+            if (random.nextBoolean()) {
+                monster = new Monster(sizeBoard);
+            } else if (random.nextBoolean()) {
+                monster = new BigMonster(sizeBoard);
+            } else {
+                monster = new SmallMonster(sizeBoard);
+            }
+
+            int row = monster.getY() - 1;
+            int column = monster.getX() - 1;
+
+            if (board[row][column].equals("  ")) {
+                board[row][column] = monster.getImage();
+                monsters[count] = monster;
+                count++;
+            }
         }
 
         board[castleY - 1][castleX - 1] = castle;
+        FinallBossMonster bossMonster = new FinallBossMonster(castleX, castleY);
 
         System.out.println("Привет! Ты готов начать играть в игру? "+ "(Напиши: ДА или НЕТ)");
 
@@ -42,6 +59,7 @@ public class Main {
 
         switch (answer) {
             case "ДА":
+
                 System.out.println("Выбери сложность игры (от 1 до 5):");
                 int difficultGame = scanner.nextInt();
                 System.out.println("Выбранная сложность:\t" + difficultGame);
@@ -66,8 +84,14 @@ public class Main {
                             System.out.println("Ход корректный; Новые координаты: " + person.getX() + ", " + person.getY() + "\nХод номер: " + step);
 
                         } else if (board[y - 1][x - 1].equals(castle)) {
-                            System.out.println("Вы прошли игру!");
-                            break;
+                            if (bossMonster.startBossFight(difficultGame, person)){
+                                System.out.println("\n\uD83C\uDF89 УРА! Вы одолели босса в яростной схватке и захватили замок! Победа! \uD83C\uDF89");
+                                break;
+                            } else {
+                                System.out.println("\n💀 Вы были слишком медлительны... Босс поверг вас у стен замка. Игра окончена.");
+                                break;
+                            }
+
                         } else {
                             for (Monster monster : monsters) {
                                 if (monster.conflictPerson(x, y)) {
@@ -103,8 +127,10 @@ public class Main {
                 break;
         }
     }
+
+
     static void outputBoard(String[][] board, int live) {
-        String leftBlock = " | ";
+        String leftBlock = "| ";
         String rightBlock = " |";
         String wall = " + —— + —— + —— + —— + —— + ";
 
