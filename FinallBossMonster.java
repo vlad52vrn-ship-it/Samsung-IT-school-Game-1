@@ -27,12 +27,14 @@ public class FinallBossMonster {
         // Сложность 1 = 4.0 сек, Сложность 5 = 1.6 сек.
         double timeLimitSeconds = Math.max(5 , 7 - (difficultGame * 0.6));
 
+        waitForPlayerReady(scanner);
+
         while (health > 0 && person.getLive() > 0) {
             System.out.println("\n--- Жизни босса: " + health + " | Ваши жизни: " + person.getLive() + " ---");
             System.out.printf("Приготовьтесь... Время на реакцию: %.1f сек.\n", timeLimitSeconds);
 
             // Небольшая пауза перед атакой для создания напряжения
-            try { Thread.sleep(1500); } catch (InterruptedException ignored) {}
+            try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
 
             // Выбираем случайное слово
             String targetWord = qteCommands[random.nextInt(qteCommands.length)];
@@ -60,7 +62,12 @@ public class FinallBossMonster {
 
         return health <= 0;
     }
-
+    private void waitForPlayerReady(Scanner scanner) {
+        System.out.println("\n Нажмите [Enter], когда будете готовы к бою...");
+        if (scanner.hasNextLine()) {
+            scanner.nextLine();
+        }
+    }
     /**
      * Метод для неблокирующего чтения консоли с ограничением по времени
      */
